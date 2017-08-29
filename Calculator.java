@@ -3,17 +3,6 @@ package imd0412.parkinglot.calculator;
 import imd0412.parkinglot.ParkingLotType;
 
 public class Calculator {
-
-	private int minute;
-	private int hour;
-	private int dayOfMonth;
-	private int month;
-	private int year;
-
-
-
-
-
 	/**
 	 * Calculates the staying cost in the parking lot.
 	 * 
@@ -123,13 +112,5 @@ public class Calculator {
 				}
 			}
 		}
-	}
-
-	public getInfo(){
-		int minute = checkinTime.getMinute();
-		int hour = checkinTime.getHour();
-		int dayOfMonth = checkinTime.getDayOfMonth();
-		int month = checkinTime.getMonth().getValue();
-		int year = checkinTime.getYear();
 	}
 }
