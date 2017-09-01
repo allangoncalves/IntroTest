@@ -1,7 +1,6 @@
 #!/usr/bin/python
 import ast
 import os
-from threading import Thread
 
 class MyCustomVisitor(ast.NodeVisitor):
     
