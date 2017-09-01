@@ -9,10 +9,18 @@ class Examiner():
 		self.root = root
 
 	def badNameDetection(self):
-		self.myVisitor.visit(root)
+		self.myVisitor.visit(self.root)
 		for name in self.myVisitor.names:
 			if(len(name)<=3 or len(name)>=20):
 				print("Bad Name Definition in: {}".format(name))
+
+	def tooManyArguments(self):
+		self.myVisitor.visit(self.root)
+		dictionary = self.myVisitor.numberOfArguments
+		for name in dictionary:
+			if dictionary[name] >1: 
+				print("Function {} has too many arguments: {}".format(name, dictionary[name]))
+
 
 
 
@@ -32,4 +40,5 @@ if __name__ == "__main__" :
 			root = ast.parse(file_str)
 			detector = Examiner(root)
 			detector.badNameDetection()
+			detector.tooManyArguments()
 

@@ -1,11 +1,15 @@
 #!/usr/bin/python
 import ast
 import os
+import sys
 
 class MyCustomVisitor(ast.NodeVisitor):
     
     def __init__(self):
+    	self.count = 0
         self.dictionary = {}
+        self.names = []
+        self.numberOfArguments = {}
     
     # Aux function
     def get_call_name(self, node):
@@ -24,13 +28,16 @@ class MyCustomVisitor(ast.NodeVisitor):
         elif isinstance(node.ctx, ast.Del):
             return 'Del'
 
-    def print_call(self):
+    def print_Call(self):
         print("\tAll functions called in this code:")
         for name in self.dictionary:
             print("\t\t{0} was called {1} times.".format(name, self.dictionary[name]))
             
-    def visit_Call(self, node):        
+    def visit_Call(self, node):  
+    	self.count += 1      
         call_name = self.get_call_name(node)
+        print("\t'{0}' was called.".format(call_name))
+        self.numberOfArguments[call_name] = len(node.args)
         if call_name not in self.dictionary:
             self.dictionary[call_name] = 1
         else:
@@ -56,17 +63,20 @@ class MyCustomVisitor(ast.NodeVisitor):
     def visit_Name(self, node):
         context = self.get_variable_context(node)
         print("\t'{0}' was found with {1} context.".format(node.id, context))
+        super(MyCustomVisitor, self).generic_visit(node)
+        self.names.append(node.id)
 
 
 
 
         
 if __name__ == "__main__":
-    import sys
+    
     import glob
     
     if len(sys.argv) == 2 :
-        input_files = glob.glob('./'+sys.argv[1]+'*.txt')
+    	os.chdir(sys.argv[1])
+        input_files = glob.glob('./*.py')
     else :
         input_files = glob.glob('./*.py')
 
@@ -84,5 +94,5 @@ if __name__ == "__main__":
             # visits the Abstract Syntax Tree
             visitor = MyCustomVisitor()
             visitor.visit(root)
-            visitor.print_call()
+            visitor.print_Call()
 
