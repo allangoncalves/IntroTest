@@ -3,6 +3,27 @@ import ast
 import os
 import sys
 
+class auxVisitor(ast.NodeVisitor):
+
+    def __init__(self):
+        self.dictionary = {}
+
+    def visit_Call(self, node):        
+        call_name = self.get_call_name(node)
+        self.dictionary[call_name] = 1 if call_name not in self.dictionary else self.dictionary[call_name]+1
+        super(auxVisitor, self).generic_visit(node)
+
+    def get_call_name(self, node):
+        if isinstance(node.func, ast.Name):
+            return node.func.id
+        elif isinstance(node.func, ast.Attribute):
+            return node.func.attr
+        else:
+            raise NotImplementedError("Could not extract call-name from node: " + str(node))
+
+    def getDictionary(self):
+        return self.dictionary
+
 class MyCustomVisitor(ast.NodeVisitor):
     
     def __init__(self):
@@ -29,19 +50,17 @@ class MyCustomVisitor(ast.NodeVisitor):
             return 'Del'
 
     def print_Call(self):
-        print("\tAll functions called in this code:")
+        print("\tAll defined functions called in this code:")
         for name in self.dictionary:
-            print("\t\t{0} was called {1} times.".format(name, self.dictionary[name]))
+            print("\t\t{0} was called.".format(name))
+            for mydict in self.dictionary[name]:
+                print("\t\t\t{0} was called {1}x.".format(mydict, self.dictionary[name][mydict]))
             
     def visit_Call(self, node):  
     	self.count += 1      
         call_name = self.get_call_name(node)
         print("\t'{0}' was called.".format(call_name))
         self.numberOfArguments[call_name] = len(node.args)
-        if call_name not in self.dictionary:
-            self.dictionary[call_name] = 1
-        else:
-            self.dictionary[call_name] += 1 
         super(MyCustomVisitor, self).generic_visit(node)
 
     def visit_ClassDef(self, node):
@@ -66,9 +85,13 @@ class MyCustomVisitor(ast.NodeVisitor):
         super(MyCustomVisitor, self).generic_visit(node)
         self.names.append(node.id)
 
-
-
-
+    def visit_FunctionDef(self, node):
+        aux = auxVisitor()
+        for item in node.body:
+            aux.visit(item)
+            mydict = aux.getDictionary()
+        self.dictionary[node.name] = mydict 
+        
         
 if __name__ == "__main__":
     
