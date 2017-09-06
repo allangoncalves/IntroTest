@@ -3,7 +3,7 @@ import ast
 import os
 import sys
 
-class auxVisitor(ast.NodeVisitor):
+class bodyVisitor(ast.NodeVisitor):
 
     def __init__(self):
         self.dictionary = {}
@@ -11,7 +11,7 @@ class auxVisitor(ast.NodeVisitor):
     def visit_Call(self, node):        
         call_name = self.get_call_name(node)
         self.dictionary[call_name] = 1 if call_name not in self.dictionary else self.dictionary[call_name]+1
-        super(auxVisitor, self).generic_visit(node)
+        super(bodyVisitor, self).generic_visit(node)
 
     def get_call_name(self, node):
         if isinstance(node.func, ast.Name):
@@ -83,7 +83,7 @@ class MyCustomVisitor(ast.NodeVisitor):
         self.names.append(node.id)
 
     def visit_FunctionDef(self, node):
-        aux = auxVisitor()
+        aux = bodyVisitor()
         for item in node.body:
             aux.visit(item)
             mydict = aux.dictionary
