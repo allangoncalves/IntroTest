@@ -96,9 +96,7 @@ if __name__ == "__main__":
     
     if len(sys.argv) == 2 :
     	os.chdir(sys.argv[1])
-        input_files = glob.glob('./*.py')
-    else :
-        input_files = glob.glob('./*.py')
+    input_files = glob.glob('./*.py')
 
     ##print("Processing file: " + input_path)
     for file in input_files:
