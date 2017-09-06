@@ -21,9 +21,6 @@ class auxVisitor(ast.NodeVisitor):
         else:
             raise NotImplementedError("Could not extract call-name from node: " + str(node))
 
-    def getDictionary(self):
-        return self.dictionary
-
 class MyCustomVisitor(ast.NodeVisitor):
     
     def __init__(self):
@@ -89,7 +86,7 @@ class MyCustomVisitor(ast.NodeVisitor):
         aux = auxVisitor()
         for item in node.body:
             aux.visit(item)
-            mydict = aux.getDictionary()
+            mydict = aux.dictionary
         self.dictionary[node.name] = mydict 
         
         
