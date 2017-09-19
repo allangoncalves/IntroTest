@@ -13,7 +13,11 @@ class Guarda():
 			with open(".table", "r") as input:
 				file_str  = input.read()
 				self.files = json.loads(file_str)
+				for item in self.files:
+					myhash = hmac.new("").hexdigest()
+					self.files[item] = myhash.update(self.files[item])
 				self.early = self.files
+
 
 	def projectParser(self, projectFolder):
 			os.chdir(projectFolder)
@@ -46,7 +50,7 @@ if __name__ == '__main__':
 	if len(sys.argv) >= 2:
 		g = Guarda()
 		g.projectParser(sys.argv[1])
-		j = json.dumps(g.files, ensure_ascii=False, indent=4)
+		j = json.dumps(g.files, ensure_ascii=True, indent=4)
 		f = open(".table", "w")
 		f.write(j)
 		f.close()
