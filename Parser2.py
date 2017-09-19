@@ -8,52 +8,58 @@ class Guarda():
 		self.files = {}
 		self.early = {}
 
-	def getBack(self):
+	def loadData(self):
+		for directory, folderName, file in os.walk("."):
+				for name in file:
+					if name != ".table":
+						fullName = os.path.join(directory, name).decode('unicode-escape')
+						self.files[fullName] = None
+		
 		if os.path.isfile(".table"):
 			with open(".table", "r") as input:
 				file_str  = input.read()
-				self.files = json.loads(file_str)
-				for item in self.files:
-					myhash = hmac.new("").hexdigest()
-					self.files[item] = myhash.update(self.files[item])
-				self.early = self.files
+				self.early = json.loads(file_str)
 
+		self.calculateHash()
 
-	def projectParser(self, projectFolder):
-			os.chdir(projectFolder)
-			self.getBack()
-			print(self.early)
-			for directory, folderName, file in os.walk("."):
-				for name in file:
-					if name != ".table":
-						fullName = os.path.join(directory, name) 
-						#print(os.path.join(directory, name))
-						print("Opening file:{}".format(name))
-						with open(fullName, "r") as input:
-							file_str  = input.read()
-							myhash = hmac.new(file_str).hexdigest()
-							if fullName not in self.files:
-								self.files[fullName] = myhash
-								self.early[fullName] = myhash
-								print("{} foi adicionado".format(fullName))
-							elif not self.files[fullName] == myhash:
-								print("{} foi alterado".format(fullName))
-								ans = input("Deseja salvar as alterações?(S/N)")
-								if(ans == "S"):
-									self.files[fullName] = myhash
-			diff = set(self.files.items()) ^ set(self.early.items())
-			for d in diff:
-				print("{} foi removido".format(d))
+		diff = set(self.files.items()) ^ set(self.early.items())
+		for d in diff:
+			print("{} foi removido".format(d))
+#####
+	def saveData(self):
+		with open(".table", "w") as inputFile:
+			jsondata = json.dumps(g.files, ensure_ascii=True, indent=4)
+			inputFile.write(jsondata)
+
+	def calculateHash(self):
+			for fullName in self.files:
+				print("Opening file:{}".format(fullName))
+				with open(fullName, "r") as input:
+					file_str  = input.read()
+					myhash = hmac.new(file_str).hexdigest().decode('unicode-escape')
+					if fullName not in self.early:
+						self.files[fullName] = myhash
+						self.early[fullName] = myhash
+						print("{} foi adicionado".format(fullName))
+					elif not self.early[fullName] == myhash:
+						print("{} foi alterado".format(fullName))
+						print(myhash)
+						ans = raw_input("Deseja salvar as alterações?(S/N)")
+						if(ans.lower() == "s"):
+							self.files[fullName] = myhash
+							self.early[fullName] = myhash
+						else:
+							self.files[fullName] = self.early[fullName]
+					else:
+						self.files[fullName] = myhash
+						self.early[fullName] = myhash
 
 if __name__ == '__main__':
 
 	if len(sys.argv) >= 2:
+		os.chdir(sys.argv[1])
 		g = Guarda()
-		g.projectParser(sys.argv[1])
-		j = json.dumps(g.files, ensure_ascii=True, indent=4)
-		f = open(".table", "w")
-		f.write(j)
-		f.close()
-		#"/home/allangoncalves/Downloads"
+		g.loadData()
+		g.saveData()
 	else:
 		print("Insira o diretório a ser guardado")
