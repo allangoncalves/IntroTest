@@ -36,12 +36,12 @@ class Guarda():
 				print("Opening file:{}".format(fullName))
 				with open(fullName, "r") as input:
 					file_str  = input.read()
-					myhash = hmac.new(file_str).hexdigest().decode('unicode-escape')
+					myhash = hmac.new(file_str).hexdigest()
 					if fullName not in self.early:
 						self.files[fullName] = myhash
 						self.early[fullName] = myhash
 						print("{} foi adicionado".format(fullName))
-					elif not self.early[fullName] == myhash:
+					elif not myhash.compare_digest(self.early[fullName]):
 						print("{} foi alterado".format(fullName))
 						print(myhash)
 						ans = raw_input("Deseja salvar as alterações?(S/N)")
